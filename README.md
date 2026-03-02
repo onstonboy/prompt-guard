@@ -27,17 +27,17 @@ It is intended to be used in three main ways:
 ```ts
 import { sanitizeText, desanitizeText } from "prompt-guard";
 
-const input = `Login with email chuong@example.com and token sk-abc123...`;
+const input = `Login with email user@example.com and token sk-abc123...`;
 
 const { safeText, mappings } = sanitizeText(input);
 // → safeText: "Login with email <SPG_EMAIL_ADDRESS_1> and token <SPG_OPENAI_API_KEY_1>"
-// → mappings: [{ placeholder: "<SPG_EMAIL_ADDRESS_1>", value: "chuong@example.com", patternId: "email_address" }, ...]
+// → mappings: [{ placeholder: "<SPG_EMAIL_ADDRESS_1>", value: "user@example.com", patternId: "email_address" }, ...]
 
-// Gửi safeText ra ngoài (HTTP, AI, log, v.v.)
+// Send safeText to the outside world (HTTP, AI, logs, etc.)
 
 const aiResponse = "I will not store <SPG_EMAIL_ADDRESS_1> or <SPG_OPENAI_API_KEY_1>.";
 const restored = desanitizeText(aiResponse, mappings);
-// → "I will not store chuong@example.com or sk-abc123..."
+// → "I will not store user@example.com or sk-abc123..."
 ```
 
 ## What is considered sensitive?
@@ -161,65 +161,65 @@ import {
 - `SENSITIVE_PATTERNS`
   - Exported catalog for inspection or custom filtering.
 
-## CLI: `guard` – chạy app đã được guard
+## CLI: `guard` – run a guarded Node app
 
-Sau khi cài:
+After installing in your Node project:
 
 ```bash
 npm install prompt-guard --save-dev
 ```
 
-Trong project của anh, đảm bảo `package.json` có 1 trong 2 script:
+Make sure your app's `package.json` has one of these scripts:
 
 ```jsonc
 {
   "scripts": {
     "dev": "node index.js"
-    // hoặc
+    // or
     // "start": "node index.js"
   }
 }
 ```
 
-Bây giờ anh có thể chạy app qua lớp guard:
+You can now run your app through the guard:
 
 ```bash
 npx guard
 ```
 
-Hành vi:
+Behavior:
 
-- `guard` sẽ:
-  - Tìm script `dev` (ưu tiên) hoặc `start` trong `package.json`.
-  - Chạy nó qua Node với `NODE_OPTIONS=-r prompt-guard/dist/register.js`.
-  - Module `register` sẽ patch `global.fetch`:
-    - Nếu `fetch` được gọi với `body` dạng string → nội dung body được `sanitizeText` trước khi gửi ra ngoài.
-- Code của anh **không cần thay đổi**; chỉ cần dùng `fetch` như bình thường.
+- `guard` will:
+  - Look for a `dev` script (preferred) or `start` in `package.json`.
+  - Run it with `NODE_OPTIONS=-r prompt-guard/dist/register.js`.
+  - The `register` module patches `global.fetch`:
+    - If `fetch` is called with a string `body`, that body is passed through `sanitizeText` before being sent.
+- Your app code **does not need to change**; just use `fetch` as usual, as long as you start it via `npx guard`.
 
-Ví dụ:
+Example:
 
 ```ts
-// code app của anh
+// Your app code
 const resp = await fetch("https://api.example.com/log", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ message: "Token của anh là 123456789" }),
+  body: JSON.stringify({ message: "My access token is 123456789" }),
 });
 ```
 
-Khi chạy bằng:
+When running with:
 
 ```bash
 npx guard
 ```
 
-thì body thật gửi ra sẽ giống kiểu:
+the actual body sent will look like:
 
 ```json
-{ "message": "Token của anh là <SPG_STANDALONE_NUMERIC_TOKEN_1>" }
+{ "message": "My access token is <SPG_STANDALONE_NUMERIC_TOKEN_1>" }
 ```
 
-→ Server bên ngoài **không bao giờ thấy số thật**, mà chỉ thấy placeholder.
+→ The upstream server **never sees the real secret**, only a placeholder.
 
 ## Local HTTP proxy: `guard-proxy` (any platform)
 
