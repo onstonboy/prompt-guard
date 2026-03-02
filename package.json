@@ -1,0 +1,27 @@
+{
+  "name": "prompt-guard",
+  "version": "1.0.0",
+  "description": "Local-only prompt sanitizer / middleware for AI agents (secure placeholder mapping).",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "ai",
+    "security",
+    "prompt",
+    "sanitizer",
+    "middleware",
+    "privacy"
+  ],
+  "author": "Chuong Le",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^25.3.3",
+    "typescript": "^5.9.3"
+  }
+}
