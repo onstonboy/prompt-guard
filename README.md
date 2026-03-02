@@ -221,34 +221,32 @@ thì body thật gửi ra sẽ giống kiểu:
 
 → Server bên ngoài **không bao giờ thấy số thật**, mà chỉ thấy placeholder.
 
-## Local HTTP proxy: `guard-proxy` (cho mọi platform)
+## Local HTTP proxy: `guard-proxy` (any platform)
 
-Nếu anh muốn một HTTP proxy mà **mọi client** (web, mobile, desktop, backend) có thể gọi tới:
+If you want an HTTP proxy that **any client** (web, mobile, desktop, backend) can call:
 
-1. Cài:
+1. Install:
 
 ```bash
-npm install -g prompt-guard   # hoặc dùng npx: npx guard-proxy
+npm install -g prompt-guard   # or: npx guard-proxy
 ```
 
-2. Chạy proxy:
+2. Run the proxy:
 
 ```bash
 guard-proxy
-# hoặc
-npx guard-proxy
 ```
 
-Mặc định proxy lắng nghe tại: `http://127.0.0.1:8787`.
+By default the proxy listens at: `http://127.0.0.1:8787`.
 
-3. Từ bất kỳ app nào (web, mobile, backend), gửi request tới proxy, kèm header:
+3. From any app (web, mobile, backend), send requests to the proxy with a header:
 
-- `x-guard-target`: URL thật của API anh muốn gọi (ví dụ: `https://api.example.com/path`).
+- `x-guard-target`: the real upstream API URL you want to call (for example `https://api.example.com/path`).
 
-Ví dụ (pseudo code, mọi ngôn ngữ đều tương tự):
+Example (pseudo code, works the same in any language):
 
 ```ts
-// Gửi tới proxy
+// Send to proxy
 await fetch("http://127.0.0.1:8787", {
   method: "POST",
   headers: {
@@ -256,26 +254,26 @@ await fetch("http://127.0.0.1:8787", {
     "x-guard-target": "https://api.example.com/log"
   },
   body: JSON.stringify({
-    message: "Token của anh là 123456789",
+    message: "My access token is 123456789",
     db: "postgres://user:pass@host/db"
   })
 });
 ```
 
-Hành vi:
+Behavior:
 
-- Proxy sẽ:
-  - Đọc body request.
-  - Chạy `sanitizeText` để mask token/secret/ID/... rồi forward tới `x-guard-target`.
-  - Nhận response từ upstream, chạy `desanitizeText` trước khi trả lại cho client.
-- Kết quả:
-  - **Upstream API** chỉ thấy body đã mask (placeholders).
-  - **Client (app của anh)** thấy response đã được khôi phục (nếu upstream echo placeholders về).
+- The proxy will:
+  - Read the request body.
+  - Run `sanitizeText` to mask tokens/secrets/IDs/etc., then forward the safe body to `x-guard-target`.
+  - Receive the upstream response and run `desanitizeText` (if placeholders are present) before returning it to the client.
+- Result:
+  - The **upstream API** only ever sees masked bodies (placeholders).
+  - The **client (your app)** can still see restored values if the upstream echoes placeholders back.
 
-Với cách này:
+With this setup:
 
-- Bất kỳ project nào (web, mobile, backend, CLI) chỉ cần:
-  - Đổi base URL sang `http://127.0.0.1:8787`.
-  - Thêm header `x-guard-target` là URL thật.
-- Không phụ thuộc vào runtime (Node/Flutter/Swift/Kotlin, v.v.) miễn là gọi được HTTP tới proxy.
+- Any project (web, mobile, backend, CLI) only needs to:
+  - Point its base URL to `http://127.0.0.1:8787`.
+  - Add the `x-guard-target` header with the real URL.
+- It does not depend on runtime (Node/Flutter/Swift/Kotlin, etc.) as long as it can send HTTP through the proxy.
 
