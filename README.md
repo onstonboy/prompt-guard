@@ -211,3 +211,61 @@ thì body thật gửi ra sẽ giống kiểu:
 
 → Server bên ngoài **không bao giờ thấy số thật**, mà chỉ thấy placeholder.
 
+## Local HTTP proxy: `guard-proxy` (cho mọi platform)
+
+Nếu anh muốn một HTTP proxy mà **mọi client** (web, mobile, desktop, backend) có thể gọi tới:
+
+1. Cài:
+
+```bash
+npm install -g prompt-guard   # hoặc dùng npx: npx guard-proxy
+```
+
+2. Chạy proxy:
+
+```bash
+guard-proxy
+# hoặc
+npx guard-proxy
+```
+
+Mặc định proxy lắng nghe tại: `http://127.0.0.1:8787`.
+
+3. Từ bất kỳ app nào (web, mobile, backend), gửi request tới proxy, kèm header:
+
+- `x-guard-target`: URL thật của API anh muốn gọi (ví dụ: `https://api.example.com/path`).
+
+Ví dụ (pseudo code, mọi ngôn ngữ đều tương tự):
+
+```ts
+// Gửi tới proxy
+await fetch("http://127.0.0.1:8787", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-guard-target": "https://api.example.com/log"
+  },
+  body: JSON.stringify({
+    message: "Token của anh là 123456789",
+    db: "postgres://user:pass@host/db"
+  })
+});
+```
+
+Hành vi:
+
+- Proxy sẽ:
+  - Đọc body request.
+  - Chạy `sanitizeText` để mask token/secret/ID/... rồi forward tới `x-guard-target`.
+  - Nhận response từ upstream, chạy `desanitizeText` trước khi trả lại cho client.
+- Kết quả:
+  - **Upstream API** chỉ thấy body đã mask (placeholders).
+  - **Client (app của anh)** thấy response đã được khôi phục (nếu upstream echo placeholders về).
+
+Với cách này:
+
+- Bất kỳ project nào (web, mobile, backend, CLI) chỉ cần:
+  - Đổi base URL sang `http://127.0.0.1:8787`.
+  - Thêm header `x-guard-target` là URL thật.
+- Không phụ thuộc vào runtime (Node/Flutter/Swift/Kotlin, v.v.) miễn là gọi được HTTP tới proxy.
+

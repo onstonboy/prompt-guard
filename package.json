@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "guard": "dist/cli.js"
+    "guard": "dist/cli.js",
+    "guard-proxy": "dist/proxy-cli.js"
   },
   "scripts": {
     "build": "tsc",
