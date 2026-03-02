@@ -1,0 +1,6 @@
+# Cron: check mention app/Chuong Le — 8h sáng & 8h tối (Asia/Singapore)
+# Chạy: crontab -e rồi dán 2 dòng dưới (đổi /Users/cdever/.openclaw/workspace nếu path khác).
+# Báo cáo ghi vào memory/mentions-YYYY-MM-DD-HHmm.md
+
+0 8 * * * cd /Users/cdever/.openclaw/workspace && node scripts/check-app-mentions.mjs >> memory/cron-mentions.log 2>&1
+0 20 * * * cd /Users/cdever/.openclaw/workspace && node scripts/check-app-mentions.mjs >> memory/cron-mentions.log 2>&1

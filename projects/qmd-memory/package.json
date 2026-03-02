@@ -1,0 +1,18 @@
+{
+  "name": "qmd-memory",
+  "version": "1.0.0",
+  "description": "Local vector-memory (QMD) store for agent long-term memory.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "node ./node_modules/typescript/bin/tsc",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^25.3.3",
+    "typescript": "^5.9.3"
+  }
+}

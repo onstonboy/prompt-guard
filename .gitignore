@@ -1,0 +1,9 @@
+# Root ignore
+node_modules/
+dist/
+.qmd/memory-store.json
+.cursor/
+logs/
+*.log
+*.tmp
+.DS_Store
