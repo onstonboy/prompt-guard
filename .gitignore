@@ -7,3 +7,22 @@ logs/
 *.log
 *.tmp
 .DS_Store
+
+# Workspace-specific files/folders (not part of prompt-guard library)
+.openclaw/
+memory/
+scripts/
+AGENTS.md
+BOOTSTRAP.md
+HEARTBEAT.md
+IDENTITY.md
+MEMORY.md
+SOUL.md
+TOOLS.md
+USER.md
+agent
+
+# Other projects in this workspace (keep only secure-prompt-guard in this repo)
+projects/qmd-memory/
+projects/radio_global/
+projects/landing-radio-global/
