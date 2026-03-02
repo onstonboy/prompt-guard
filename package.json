@@ -4,6 +4,9 @@
   "description": "Local-only prompt sanitizer / middleware for AI agents (secure placeholder mapping).",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "guard": "dist/cli.js"
+  },
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm run build",

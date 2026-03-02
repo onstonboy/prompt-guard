@@ -1,6 +1,6 @@
-# secure-prompt-guard
+# prompt-guard
 
-Local-only library for **sanitizing prompts** before they are sent to an AI agent, and restoring them afterwards.
+Local-only library for **sanitizing sensitive text** before it rời khỏi máy (HTTP request, log, AI call, v.v.), và (tùy trường hợp) khôi phục lại sau đó.
 
 - **Input:** raw text (prompt, context, logs).
 - **Output:**
@@ -15,7 +15,7 @@ Intended to be embedded in **VS Code / Cursor extensions, local CLIs, or desktop
 ## Basic usage
 
 ```ts
-import { sanitizeText, desanitizeText } from "secure-prompt-guard";
+import { sanitizeText, desanitizeText } from "prompt-guard";
 
 const input = `Login with email chuong@example.com and token sk-abc123...`;
 
@@ -23,7 +23,7 @@ const { safeText, mappings } = sanitizeText(input);
 // → safeText: "Login with email <SPG_EMAIL_ADDRESS_1> and token <SPG_OPENAI_API_KEY_1>"
 // → mappings: [{ placeholder: "<SPG_EMAIL_ADDRESS_1>", value: "chuong@example.com", patternId: "email_address" }, ...]
 
-// Send safeText to AI...
+// Gửi safeText ra ngoài (HTTP, AI, log, v.v.)
 
 const aiResponse = "I will not store <SPG_EMAIL_ADDRESS_1> or <SPG_OPENAI_API_KEY_1>.";
 const restored = desanitizeText(aiResponse, mappings);
@@ -141,7 +141,7 @@ import {
   SENSITIVE_PATTERNS,
   type SanitizeResult,
   type SanitizedChunk,
-} from "secure-prompt-guard";
+} from "prompt-guard";
 ```
 
 - `sanitizeText(text, options?)` → `{ safeText, mappings }`
@@ -150,4 +150,64 @@ import {
   - Replace placeholders back to original values using mappings.
 - `SENSITIVE_PATTERNS`
   - Exported catalog for inspection or custom filtering.
+
+## CLI: `guard` – chạy app đã được guard
+
+Sau khi cài:
+
+```bash
+npm install prompt-guard --save-dev
+```
+
+Trong project của anh, đảm bảo `package.json` có 1 trong 2 script:
+
+```jsonc
+{
+  "scripts": {
+    "dev": "node index.js"
+    // hoặc
+    // "start": "node index.js"
+  }
+}
+```
+
+Bây giờ anh có thể chạy app qua lớp guard:
+
+```bash
+npx guard
+```
+
+Hành vi:
+
+- `guard` sẽ:
+  - Tìm script `dev` (ưu tiên) hoặc `start` trong `package.json`.
+  - Chạy nó qua Node với `NODE_OPTIONS=-r prompt-guard/dist/register.js`.
+  - Module `register` sẽ patch `global.fetch`:
+    - Nếu `fetch` được gọi với `body` dạng string → nội dung body được `sanitizeText` trước khi gửi ra ngoài.
+- Code của anh **không cần thay đổi**; chỉ cần dùng `fetch` như bình thường.
+
+Ví dụ:
+
+```ts
+// code app của anh
+const resp = await fetch("https://api.example.com/log", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ message: "Token của anh là 123456789" }),
+});
+```
+
+Khi chạy bằng:
+
+```bash
+npx guard
+```
+
+thì body thật gửi ra sẽ giống kiểu:
+
+```json
+{ "message": "Token của anh là <SPG_STANDALONE_NUMERIC_TOKEN_1>" }
+```
+
+→ Server bên ngoài **không bao giờ thấy số thật**, mà chỉ thấy placeholder.
 
