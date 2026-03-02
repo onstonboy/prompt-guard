@@ -1,6 +1,6 @@
 # prompt-guard
 
-Local-only library for **sanitizing sensitive text** before it rời khỏi máy (HTTP request, log, AI call, v.v.), và (tùy trường hợp) khôi phục lại sau đó.
+Local-only library for **sanitizing sensitive text** before it leaves your machine (HTTP requests, logs, AI calls, etc.), and optionally restoring it afterwards.
 
 - **Input:** raw text (prompt, context, logs).
 - **Output:**

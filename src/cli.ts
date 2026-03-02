@@ -35,10 +35,10 @@ export function runGuardCli() {
 
   if (!script) {
     console.error(
-      "[prompt-guard] Không tìm thấy script 'dev' hoặc 'start' trong package.json.\n" +
-        "Hãy thêm một trong hai script này, ví dụ:\n" +
-        '  "scripts": { "dev": "node index.js" }\n' +
-        "rồi chạy lại: npx guard"
+      "[prompt-guard] Could not find a 'dev' or 'start' script in package.json.\n" +
+        "Please add one of these scripts, for example:\n" +
+        '  \"scripts\": { \"dev\": \"node index.js\" }\n' +
+        "then run: npx guard"
     );
     process.exit(1);
   }
