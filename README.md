@@ -10,7 +10,17 @@ Local-only library for **sanitizing sensitive text** before it rời khỏi máy
   - Send **only** `safeText` to remote AI.
   - On response, run `desanitizeText(response, mappings)` to map placeholders back to originals.
 
-Intended to be embedded in **VS Code / Cursor extensions, local CLIs, or desktop apps** as a local middleware.
+It is intended to be used in three main ways:
+
+- **As a library** inside your own code (backend, CLI, VS Code/Cursor extension, etc.)
+- **As a Node wrapper (`guard`)** around your existing Node app (no code changes, just run through guard).
+- **As a local HTTP proxy (`guard-proxy`)** that any client (web, mobile, desktop, tool) can call.
+
+> ⚠️ **Important:** `prompt-guard` does **not** magically hook into closed‑source tools (Cursor, Antigravity, IDEs, etc.) unless:
+> - They let you configure a **custom base URL / HTTP proxy**, and you point that to `guard-proxy`, or
+> - They provide a **plugin/extension API** where you can call `sanitizeText` yourself.
+>  
+> It guards **all traffic you deliberately route through it**, but it cannot attach itself to processes you don’t control.
 
 ## Basic usage
 
